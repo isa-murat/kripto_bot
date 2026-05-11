@@ -51,9 +51,10 @@ MIN_BARS_FOR_STRATEGY = 60
 # past (swings, FVGs, pools) — passing the full multi-month DataFrame to
 # `evaluate()` every bar is O(n²) on the bar count. Window must be large enough
 # to cover ATR(14) warmup + a few swings + range_lookback × HTF context.
-WINDOW_LTF_BARS = 400      # ~33 hours of 5m
-WINDOW_HTF_BARS = 300      # ~12.5 days of 1h — needs to be big enough to host
-                            # swings + BOS event so HTF trend isn't perpetually NEUTRAL
+# Run22 pivot: LTF is now 15m. 400 bars × 15m = ~4.2 days (was ~33 h on 5m).
+# HTF unchanged at 1h × 300 bars = ~12.5 days.
+WINDOW_LTF_BARS = 400
+WINDOW_HTF_BARS = 300
 
 app = typer.Typer(help="Backtest the strategy on historical OHLCV data.")
 
@@ -102,7 +103,7 @@ async def run_backtest(
     symbol: str,
     from_dt: datetime,
     to_dt: datetime,
-    entry_tf: str = "5m",
+    entry_tf: str = "15m",
     bias_tf: str = "1h",
     params=None,
     initial_equity: float = 10_000.0,
@@ -276,7 +277,7 @@ def run(
     symbol: str = typer.Option(..., help="e.g. BTCUSDT"),
     from_: str = typer.Option(..., "--from", help="ISO date YYYY-MM-DD (UTC)"),
     to: str | None = typer.Option(None, help="ISO date YYYY-MM-DD (default: now UTC)"),
-    entry_tf: str = typer.Option("5m"),
+    entry_tf: str = typer.Option("15m"),
     bias_tf: str = typer.Option("1h"),
     initial_equity: float = typer.Option(10_000.0),
     no_killzone: bool = typer.Option(False, help="Disable killzone filter (longer evaluation window)"),

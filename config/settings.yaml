@@ -12,8 +12,8 @@ symbols:
   - XRPUSDT
 
 timeframes:
-  entry: 5m            # Sinyal üretilen ana timeframe
-  bias: 1h             # HTF bias timeframe
+  entry: 15m           # Run22 pivot: 5m → 15m (LTF entry)
+  bias: 1h             # HTF bias timeframe (unchanged)
   trigger: 1m          # Hassas tetikleme/MSS doğrulama (opsiyonel)
 
 data:
@@ -75,15 +75,16 @@ filters:
       start_utc: "00:00"
       end_utc: "04:00"
       enabled: false      # default off — backtest'te ayrıca etkisi ölçülecek
-  # 4H HTF regime gate (analysis/trend_classifier kullanır).
+  # HTF regime gate (analysis/trend_classifier kullanır).
   # multi_run1 bulgusu: ranging regime toplam zararın %77'sini üretti.
-  # Trending pencerelerde sweep+FVG iyi davranıyor, ranging'de SL yiyor.
+  # Run22 pivot: regime HTF 4h → 1h, classification_lookback 20 → 30
+  # (1h'de 30 bar = 30 saat, 4h'de 20 bar = 80 saat'e yakın window).
   regime_filter:
     enabled: true
     exclude_ranging: true
     exclude_trending: false     # trending şimdilik açık
-    htf_timeframe: 4h
-    classification_lookback: 20
+    htf_timeframe: 1h
+    classification_lookback: 30
 
 logging:
   level: INFO

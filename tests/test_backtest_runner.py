@@ -81,12 +81,11 @@ async def test_run_backtest_flat_data_produces_no_signals(tmp_path: Path, monkey
     get_env.cache_clear()
 
     start = datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
-    # 200 LTF bars (5m), 200 HTF bars (1h) — well above MIN_BARS_FOR_STRATEGY
-    ltf = _bars(200, start=start, minutes_per_bar=5)
+    # 200 LTF bars (15m), 200 HTF bars (1h) — well above MIN_BARS_FOR_STRATEGY
+    ltf = _bars(200, start=start, minutes_per_bar=15)
     htf = _bars(200, start=start, minutes_per_bar=60)
 
-    (tmp_path / "TESTUSDT_5m.parquet").write_bytes(b"")
-    ltf.write_parquet(tmp_path / "TESTUSDT_5m.parquet")
+    ltf.write_parquet(tmp_path / "TESTUSDT_15m.parquet")
     htf.write_parquet(tmp_path / "TESTUSDT_1h.parquet")
 
     params = SetupParams(require_killzone=False)

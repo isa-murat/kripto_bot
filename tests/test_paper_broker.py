@@ -202,11 +202,11 @@ def test_exit_fee_uses_taker_rate_on_expired(broker: PaperBroker):
 
 
 def test_pending_ttl_expires_stale_position(broker: PaperBroker):
-    """A PENDING position older than the TTL (default 120min = 24 × 5m bars) is cancelled."""
+    """A PENDING position older than the TTL (default 24 × 15m = 6h) is cancelled."""
     broker.open_from_signal(_signal(entry=100.0, sl=99, tp=102))
     assert len(broker.pending_positions) == 1
-    # Forward time past TTL (default 120 min for 24 × 5m bars)
-    later = datetime(2026, 5, 11, 14, 30, tzinfo=UTC)   # 150 min later
+    # Forward time past TTL (default 6h for 24 × 15m bars)
+    later = datetime(2026, 5, 11, 19, 30, tzinfo=UTC)   # 7.5 h later
     cancelled = broker.cancel_expired_pending(later)
     assert len(cancelled) == 1
     assert cancelled[0].close_reason == CloseReason.EXPIRED
@@ -225,8 +225,9 @@ def test_pending_ttl_keeps_fresh_position(broker: PaperBroker):
 def test_pending_ttl_reads_config_bars(broker: PaperBroker):
     """TTL = pending_ttl_bars × entry_tf seconds."""
     from src.config import get_settings
+    from src.utils.time import timeframe_to_seconds
     s = get_settings()
-    expected_secs = s.paper.pending_ttl_bars * 300   # entry tf 5m
+    expected_secs = s.paper.pending_ttl_bars * timeframe_to_seconds(s.timeframes.entry)
     assert broker._pending_ttl.total_seconds() == expected_secs
 
 

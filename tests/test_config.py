@@ -6,7 +6,7 @@ from __future__ import annotations
 def test_settings_loads(settings):
     assert settings.exchange.name == "binance"
     assert "BTCUSDT" in settings.symbols
-    assert settings.timeframes.entry == "5m"
+    assert settings.timeframes.entry == "15m"
     assert settings.timeframes.bias == "1h"
 
 

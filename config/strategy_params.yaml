@@ -2,7 +2,9 @@
 # Faz 4 backtest sırasında bu değerler tune edilecek.
 
 structure:
-  # Swing/pivot tespitinde her yöne lookback (fractal mum sayısı)
+  # Swing/pivot tespitinde her yöne lookback (fractal mum sayısı).
+  # Run22 pivot: LTF artık 15m. Key adı tarihsel sebepten "_5m" kalsa da
+  # değeri 15m fractal için kullanılır (3 = 7-bar pencere, ICT kanonik).
   swing_lookback_5m: 3
   swing_lookback_1h: 5
   # Displacement = body büyüklüğü > displacement_atr_mult × ATR
@@ -70,14 +72,16 @@ setup_sweep_fvg:
 setup_ote:
   # OTE (Optimal Trade Entry) — klasik ICT, trend-following.
   # MSS sonrası impulse leg'in fib retracement zonuna (0.618-0.786) entry.
-  # 2026-05-11 baseline parametreleri — backtest sonrası tune edilecek.
+  # Run22 pivot: 15m LTF + 1h HTF (önceki 5m+1h baseline'dan).
   #
-  # MSS'i geriye doğru tarama penceresi
+  # MSS'i geriye doğru tarama penceresi (15m'de 30 bar = 7.5 saat)
   mss_lookback_bars: 30
-  # MSS öncesi leg base'i ararken pencere (daha geniş = daha eski leg'ler)
+  # MSS öncesi leg base'i ararken pencere (15m'de 50 bar = 12.5 saat)
   max_leg_lookback_bars: 50
-  # Leg amplitude > min_leg_atr_mult × ATR (gürültü leg'lerini at)
-  min_leg_atr_mult: 1.5
+  # Leg amplitude > min_leg_atr_mult × ATR (gürültü leg'lerini at).
+  # Run22: 1.5 → 2.5 — 15m bar daha kalın, gürültüden ayrılmak için daha
+  # kuvvetli impulse şart.
+  min_leg_atr_mult: 2.5
   # Fib zone sınırları (ICT canonical 0.618-0.786)
   fib_zone_low: 0.618
   fib_zone_high: 0.786
