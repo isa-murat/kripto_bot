@@ -6,14 +6,19 @@
 
 ## Aktif sorular
 
-- [ ] **Q-011:** ICT paradigma terk mi, sembol-tarama mı, farklı zaman çerçevesi mi?
-  - Bağlam: 19 backtest iterasyonu (Sweep+FVG + OTE) bir ICT setup-symbol kombinasyonunun ardışık iki pencerede +EV gösterdiğini göstermedi. F-13'te paradigma reversal hipotezi (F-12) de OOS'ta çöktü.
+- [ ] **Q-012:** ICT terk edildi (Q-011 cevabı A). Hangi yeni paradigma?
+  - Bağlam: F-14, 20 backtest iterasyonu hiçbir ICT setup-symbol-TF
+    kombinasyonu ardışık iki pencerede +EV vermedi. Sweep+FVG ve OTE
+    (5m+1h ve 15m+1h) terk edildi.
   - Adaylar:
-    - **A) ICT tamamen terk** — fundamental farklı yaklaşım: statistical arbitrage, ML-based, order flow / volume profile, funding-rate arbitrage. ICT'nin Forex varsayımları crypto'ya transfer olmadığı kanıtlandı.
-    - **B) Sembol tarama** — top-20/50 USDT-M pair üzerinde mevcut OTE'yi tara (geniş universe). F-12'deki paradigm reversal hipotezini deneysel olarak test et; XRP-tip sembolleri bul (low-vol mean-reverter karakter), her birini iki window'da OOS-validate et. Kapsam genişledikçe edge'li bir alt-küme bulunabilir.
-    - **C) Farklı zaman çerçevesi** — 15m bias + 5m entry yerine 1h bias + 15m entry (daha az gürültü, daha az sinyal, kalite-odaklı). ICT'yi terketmeden TF-pivot.
-    - **D) Volatility-aware TP** + B paralel — F-03 önerisi tek başına yetmedi ama belki sembol-tarama ile birlikte fark yaratır.
-  - Etkilediği yerler: tüm strateji ailesi, `src/data/downloader.py` (B için 50 sembol indirme), backtest pipeline.
+    - **A) Statistical arbitrage** — pair trading (BTC/ETH spread, BNB/SOL), Bollinger Z-score mean reversion, cointegration based.
+    - **B) Volume profile / VWAP-based** — VWAP deviasyon stratejileri, POC retest entry. Volume-driven, ICT'den bağımsız.
+    - **C) ML-based** — feature engineering (rolling stats, microstructure) → classifier veya regressor. XGBoost / LightGBM. Walk-forward validation şart.
+    - **D) Funding rate arbitrage** — Binance funding rate'in extreme'leri vs spot/futures premium. Cash-and-carry tarzı veya kontra-funding entry.
+    - **E) Order flow / orderbook imbalance** — limit order book depth/imbalance, footprint chart benzeri features. Live data lazım (geçmiş tape replay zor).
+  - Etkilediği yerler: tüm strateji ailesi, yeni feature pipeline, downloader (D için funding rate, E için book data).
+  - **Plan:** Kullanıcı tartışması bekliyor. Aday başına minimum data
+    seti ve feasibility değerlendirmesi gerek.
 
 - [ ] **Q-009:** Sembol seçimi yeniden değerlendirilmeli mi?
   - Bağlam: F-07 → XRP low-vol mean-reverter, F-03 → BTC/BNB trend ETH/SOL choppy. Top-5 uniform tedavi etmek edge'i öldürdü.
@@ -68,11 +73,23 @@
 
 ## Cevaplanmış (referans için)
 
+- ✅ **Q-011 (2026-05-11):** ICT paradigma terk mi, sembol-tarama mı, farklı TF mi?
+  - **Cevap: A — ICT tamamen terk.**
+  - **Yöntem:** C (1h+15m TF pivot) ardışık opsiyon olarak test edildi
+    (Run22, peşinen imzalanmış sözleşme). 4 IS kriterden 3'ü FAIL
+    (pooled margin -3.4pp, 1 sembol +EV, WR BE'nin 6.4pp altında).
+    Sözleşme tetiklendi, OOS atlandı (F-14).
+  - 20 backtest iterasyonu (Sweep+FVG 5 sweep + OTE 5m+1h × 16 +
+    OTE 15m+1h × 1) hiç ardışık-pencere +EV göstermedi. ICT'nin Forex
+    varsayımları crypto için temelden uygun değil.
+  - Yeni soru Q-012: hangi alternatif paradigma seçilmeli?
+
 - ✅ **Q-008 (2026-05-11):** Yeni strateji ailesi hangisi olmalı?
   - **Seçim:** OTE (Klasik ICT, 2R sabit TP, 5 sembol birden).
   - **Sonuç:** Run20 IS pool -EV (-4.1pp, N=1375), tek pozitif XRP +7.0pp.
     Run21 OOS'da XRP -8.3pp → window-specific fluke (F-13).
-    Yeni soru Q-011: ICT paradigma terk mi, tarama mı, TF değişikliği mi?
+    Run22 TF pivot (15m+1h) da FAIL (F-14). ICT projesi resmen terk
+    edildi → Q-011 cevabı A.
 
 - ✅ **Q-001 (2026-05-11):** Binance API key permission?
   - **Cevap:** Read-only. Paper trading için trade izni gereksiz; gerçek trading'e

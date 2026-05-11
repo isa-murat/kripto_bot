@@ -2,24 +2,27 @@
 
 PEŞİNEN imzalanmış başarı/başarısızlık kriterleri. Post-hoc rasyonalizasyon, "şu tweak ile dene", "bir parametre daha" YASAK.
 
+**Verdict (2026-05-11):** ❌ **IS FAIL** — 4 kriterden 3'ü kesin altta.
+ICT projesi terk, Run23 OOS testi atlandı. Bkz F-14.
+
 ## Run22 IS Başarı Kriterleri (Nov 2025 → May 2026)
 
 ZORUNLU şartlar (HEPSİ sağlanmalı):
-- [ ] Pooled margin > +3pp
-- [ ] En az 3 sembolde individual margin > +2pp
-- [ ] Pooled N > 200 (yeterli sample size)
-- [ ] Pooled WR > break-even WR + 3pp
+- [x] ~~Pooled margin > +3pp~~ → **-3.4pp** ❌ FAIL (6.4pp altta)
+- [x] ~~En az 3 sembolde individual margin > +2pp~~ → **1** (SOL +3.8pp tek) ❌ FAIL
+- [x] Pooled N > 200 (yeterli sample size) → 541 ✅ PASS
+- [x] ~~Pooled WR > break-even WR + 3pp~~ → 32.7% < 39.1% gerek ❌ FAIL (6.4pp altta)
 
-Bunlardan biri eksikse → Run22 BAŞARISIZ → ICT projesini terk, Opsiyon A'ya geç.
+**Verdict:** FAIL → ICT projesini terk, Opsiyon A'ya geç.
 
 ## Run23 OOS Doğrulama (Run22 başarılıysa, May → Oct 2025)
 
-ZORUNLU şartlar:
-- [ ] Pooled margin > +1pp (IS'in %30'undan fazla erozyon olmamış)
-- [ ] IS'te +EV olan sembollerin en az %60'ı OOS'ta da +EV
-- [ ] Hiçbir sembolde individual margin < -5pp (catastrophic failure yok)
+**ATLANDI — Sözleşme şartı: IS fail → OOS yapma.**
 
-Bunlardan biri eksikse → ICT projesini terk, Opsiyon A'ya geç.
+ZORUNLU şartlar (Run22 IS pass olmadığı için uygulanmadı):
+- ~~Pooled margin > +1pp (IS'in %30'undan fazla erozyon olmamış)~~
+- ~~IS'te +EV olan sembollerin en az %60'ı OOS'ta da +EV~~
+- ~~Hiçbir sembolde individual margin < -5pp (catastrophic failure yok)~~
 
 ## YASAK LİSTESİ
 

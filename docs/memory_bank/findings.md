@@ -176,6 +176,64 @@ domine etti.
 
 ---
 
+## F-14 — Run22 TF pivot (1h+15m OTE) sözleşmeyle peşinen reddedildi
+
+**Bulgu:** Run20'nin "5m gürültüsü olabilir" hipotezini test etmek için OTE'yi
+1h HTF + 15m LTF'e taşıdık. Aynı pencere (Nov 2025 → May 2026), aynı 5 sembol,
+sadece TF değişti. Run22 ÖNCESİ imzalanmış sözleşme ([run22_contract.md](run22_contract.md))
+4 kriterden 3'ünde net fail:
+
+| Kriter | Hedef | Gerçek | Pass/Fail |
+|---|---|---|---|
+| Pooled margin > +3pp | > +3pp | **-3.4pp** | ❌ FAIL (6.4pp altta) |
+| ≥3 sembolde margin > +2pp | ≥ 3 | **1** (sadece SOL +3.8pp) | ❌ FAIL |
+| Pooled N > 200 | > 200 | 541 | ✅ PASS |
+| Pooled WR > BE WR + 3pp | > 39.1% | **32.7%** | ❌ FAIL (6.4pp altta) |
+
+Per-symbol breakdown:
+
+| Sembol | N | WR% | Margin | PnL ($) | Run20 (5m) margin | Δ |
+|---|---|---|---|---|---|---|
+| BTC | 113 | 31.9% | -4.9pp | -1734 | -4.8pp | aynı |
+| ETH | 105 | 37.1% | +1.6pp | +327 | -3.6pp | +5.2pp |
+| SOL | 102 | 39.2% | **+3.8pp** | +1075 | -7.9pp | +11.7pp |
+| BNB | 111 | 25.2% | -11.4pp | -3339 | -11.2pp | aynı |
+| XRP | 110 | 30.9% | -5.0pp | -1695 | **+7.0pp** | **-12.0pp** |
+
+**Why:** TF pivot semboller arası karakteri yeniden dağıttı ama edge üretmedi:
+- SOL +EV oldu (-7.9 → +3.8pp), ETH ödün verdi (-3.6 → +1.6pp).
+- XRP, Run20 IS'de tek +EV olan sembol, 15m'de tamamen çöktü
+  (+7.0 → -5.0pp). F-13'teki "window-specific fluke" tezi şimdi
+  TF-specific de oldu: sembol karakteri TF'e göre değişiyor, tek
+  konfigürasyon ile +EV stabil değil.
+- BTC ve BNB iki TF'de de neredeyse aynı kötülükte (-4.8/-4.9pp ve
+  -11.2/-11.4pp). Bu sembollere OTE setup'ı uymuyor, TF ile alakası yok.
+
+**Sözleşme verdict:** ICT projesi terk edildi. Run23 OOS testi atlandı
+(sözleşme şartı: IS fail → OOS yapma). Pivot to Opsiyon A (ICT
+fundamental abandon → statistical/ML/order-flow yaklaşımları).
+
+**Nasıl kullan:**
+- ICT primitives (swing, FVG, OB, MSS, sweep) ve setup'lar (sweep+FVG, OTE)
+  bu sembol setinde çalışmıyor. Yeni denemede ICT-aile setup'ları **baseline
+  kabul etmeyin** — Q-011 cevabı A: terk.
+- 20 backtest iterasyonu (Sweep+FVG 5 sweep + OTE 14 öncesi + Run20 IS +
+  Run21 OOS + Run22 IS) sonucu **hiç bir ICT setup-symbol-TF kombinasyonu
+  ardışık iki pencerede +EV vermedi**.
+- TF değişimi tek başına yeterli değil. ICT'nin asıl problemi paradigma
+  uygunluğu: Forex session-bound varsayımları + retracement öngörülebilirliği
+  + displacement güvenilirliği crypto'da geçici durumlar.
+- **Pre-signed contract disiplini doğru iş yaptı:** kriterler IS sonrası
+  revize edilmeden uygulandı, "yakın fail" rasyonalizasyonuna kapı açılmadı.
+  Sonraki paradigm denemesinde aynı disiplin geçerli.
+
+**İlgili dosyalar:**
+[run22_contract.md](run22_contract.md),
+[multi_run22.json](../../data/backtest/multi_run22.json),
+[BTCUSDT_run22.json](../../data/backtest/BTCUSDT_run22.json) (ve diğer 4)
+
+---
+
 ## F-13 — XRP-OTE F-11'in üçüncü tekrarı: 15pp margin swing
 
 **Bulgu:** Run20 IS (2025-11..2026-05) XRP-OTE **+7.0pp** margin (N=280,
@@ -319,5 +377,9 @@ ya da setup'ın kendisi -EV.
    **Üç bağımsız pencere** disiplini ICT'de standart yap (F-13).
 9. **Sembol karakteri (mean-reverter / trender) sezgisi yanıltıcı.**
    Paradigma-eşleştirmesi varsayımına güvenme, deneye dayalı seç (F-12).
-10. **19 iterasyon ICT bilançosu:** hiçbir setup-symbol kombinasyonu
-    ardışık iki pencerede +EV vermedi. ICT paradigm pivot kararı: Q-011.
+10. **20 iterasyon ICT bilançosu (Sweep+FVG + OTE 5m + OTE 15m):**
+    hiçbir setup-symbol-TF kombinasyonu ardışık iki pencerede +EV
+    vermedi. Run22 sözleşmeyle FAIL → Q-011 cevabı A: ICT terk (F-14).
+11. **Pre-signed acceptance contract disiplini etkili.** IS sonuçları
+    görünmeden kriter yazıldı, "yakın fail" rasyonalizasyon yasağı
+    eklendi (F-14). Sonraki paradigm denemesinde aynı disiplin.

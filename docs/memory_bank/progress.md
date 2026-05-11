@@ -3,12 +3,13 @@
 > Şu an nerede olduğumuzun canlı tablosu. Her oturumda güncellenir.
 
 **Son güncelleme:** 2026-05-11
-**Aktif faz:** Faz 4 sonu / **OTE de OOS'ta çöktü** — paradigma pivot kararı bekliyor (Q-011)
+**Aktif faz:** **ICT projesi TERK edildi** (F-14, Run22 sözleşme FAIL) — Q-011 cevabı A: yeni paradigma seçimi (statistical/ML/order-flow)
 
 > ⚠️ **Bir sonraki strateji denemesinden önce [findings.md](findings.md)'yi oku.**
-> F-01..F-13 bulguları parametre/filtre seçimlerinde ay kazandırır.
-> Son güncel: F-13 — 19 backtest iterasyonu sonucu hiçbir ICT setup
-> ardışık iki pencerede +EV göstermedi.
+> F-01..F-14 bulguları parametre/filtre seçimlerinde ay kazandırır.
+> Son güncel: F-14 — Run22 (OTE 1h+15m) pre-signed contract FAIL.
+> 20 backtest iterasyonu sonucu hiçbir ICT setup-symbol-TF kombinasyonu
+> ardışık iki pencerede +EV göstermedi. ICT terk edildi.
 
 ---
 
@@ -22,8 +23,9 @@
 | **Faz 2** — Sweep+FVG strateji + signal router + main.py entegrasyon | ✅ Tamam | 1 oturum |
 | **Faz 3** — Paper engine + position manager + günlük rapor | ✅ Tamam | 1 oturum |
 | **Faz 4** — Backtest + metrikler (Rust checkpoint) | ✅ Tamam (N=309 final, Sweep+FVG -EV doğrulandı, ADR-0011) | — |
-| **Faz 4.5** — OTE setup'ı dene | ✅ Tamam (Run20 IS pool -EV, Run21 XRP OOS -EV, F-12/F-13) | — |
-| **Faz 4.6** — ICT paradigm pivot kararı (Q-011) | 🟡 Aktif — kullanıcı tartışması bekliyor | — |
+| **Faz 4.5** — OTE setup'ı dene (5m+1h) | ✅ Tamam (Run20 IS pool -EV, Run21 XRP OOS -EV, F-12/F-13) | — |
+| **Faz 4.6** — OTE TF pivot (15m+1h, Run22) | ✅ Tamam — sözleşme FAIL (F-14), ICT terk | — |
+| **Faz 4.7** — Q-011 cevabı: yeni paradigma seçimi (statistical/ML/order-flow) | 🟡 Aktif — kullanıcı tartışması bekliyor | — |
 | **Faz 5** — İyileştirme (filtreler, tuning, monitoring) | ⏳ Yeni paradigma +EV olduktan sonra | sürekli |
 
 ---
@@ -203,6 +205,44 @@ jupyter `[backtest]` extra'sında zaten tanımlı.)
 ---
 
 ## Notlar / log
+
+- **2026-05-11 (oturum N+7 — Run22 OTE TF pivot, sözleşme FAIL, ICT terk):**
+  - **Branch:** `feature/ote-htf-1h-15m` (4h+5m → 1h+15m TF pivot).
+    Önceden `feature/ote-setup` v0.2-ote-mixed-results olarak tag'lendi.
+  - **Pre-signed acceptance contract** ([run22_contract.md](run22_contract.md)):
+    Run22 öncesi 4 IS kriteri + 3 OOS kriteri + yasak liste imzalandı.
+    Kullanıcı 4. yasak madde ekledi: "yakın fail" rasyonalizasyonu yasak.
+  - **Implementasyon:** settings.yaml entry 5m→15m, regime_filter htf 4h→1h
+    (classification_lookback 20→30); strategy_params.yaml min_leg_atr_mult
+    1.5→2.5; runner.py default entry_tf 15m. Native 15m data Binance'ten
+    indi (5 sembol × 12 ay, 36k bar/sembol). Test suite 235/235 PASSED.
+  - **Run22 IS (2025-11..2026-05, OTE 1h+15m, 5 sembol, N=541):**
+    | Sembol | N | WR | Margin | PnL ($) |
+    |---|---|---|---|---|
+    | BTC | 113 | 31.9% | -4.9pp | -1734 |
+    | ETH | 105 | 37.1% | +1.6pp | +327 |
+    | SOL | 102 | 39.2% | **+3.8pp** | +1075 |
+    | BNB | 111 | 25.2% | -11.4pp | -3339 |
+    | XRP | 110 | 30.9% | -5.0pp | -1695 |
+    | **POOL** | **541** | **32.7%** | **-3.4pp** | **-5366** |
+  - **Sözleşme verdict:** 4 kriterden 3'ü kesin altta:
+    - Pooled margin -3.4pp (hedef +3pp) — 6.4pp altta
+    - 1 sembol margin>+2pp (hedef ≥3) — sadece SOL
+    - Pooled WR 32.7% (hedef >BE+3 = 39.1%) — 6.4pp altta
+    - Sample N=541 (hedef >200) ✅ tek pass kriter
+  - **FAIL → ICT projesi resmen terk edildi.** Run23 OOS atlandı (sözleşme
+    şartı). 20 backtest iterasyonu boyunca hiç bir ICT setup-symbol-TF
+    kombinasyonu ardışık iki pencerede +EV göstermedi.
+  - **XRP TF-flip:** Run20 5m'de tek +EV (+7.0pp) idi, 15m'de -5.0pp.
+    Sembol karakteri TF'e göre değişiyor — F-13'ün "window fluke" tezi
+    şimdi TF-fluke olarak da doğrulandı.
+  - **SOL kurtuldu (-7.9 → +3.8pp), ETH zayıf-yeşil (-3.6 → +1.6pp);
+    BTC/BNB iki TF'de aynı kötü** (-4.8/-4.9pp, -11.2/-11.4pp). TF pivot
+    semboller arası karakteri yeniden dağıttı ama uniform edge üretmedi.
+  - **findings.md F-14 + Özet madde 10-11 eklendi. Q-011 cevabı A
+    (ICT terk).** open_questions.md güncelleniyor; sıradaki tartışma:
+    yeni paradigma seçimi (statistical arbitrage, ML-based, order-flow,
+    funding-rate arbitrage adaylarından hangisi).
 
 - **2026-05-11 (oturum N+6 — OTE setup + Run20 IS + Run21 XRP OOS):**
   - **Yeni modüller:** `src/strategies/ote.py` (klasik ICT OTE: HTF bias → 5m MSS → impulse leg → fib 0.618-0.786 zone first-touch → 2R fixed TP).
