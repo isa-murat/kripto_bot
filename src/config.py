@@ -164,6 +164,7 @@ class StrategyParams(BaseModel):
     liquidity: dict = Field(default_factory=dict)
     bias: dict = Field(default_factory=dict)
     setup_sweep_fvg: dict = Field(default_factory=dict)
+    setup_ote: dict = Field(default_factory=dict)
     risk: dict = Field(default_factory=dict)
 
 

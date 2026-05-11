@@ -176,6 +176,79 @@ domine etti.
 
 ---
 
+## F-13 — XRP-OTE F-11'in üçüncü tekrarı: 15pp margin swing
+
+**Bulgu:** Run20 IS (2025-11..2026-05) XRP-OTE **+7.0pp** margin (N=280,
+return +68.9%, Sharpe 2.03). Run21 OOS (aynı config, 2025-05..2025-10)
+**-8.3pp** (N=276, return -53.1%, Sharpe -3.39, Max DD 54%).
+Margin swing **+7.0 → -8.3 = ~15pp**, ETH Run13/15'teki 11pp swing'den
+daha büyük.
+
+İki bağımsız 6-ay penceresi, ikisinde de N>F-02 eşiği (200). Bu yine
+F-11'in "tek window +EV ≠ edge" kuralı — bu kez **üçüncü kez** tetiklendi:
+
+| Sembol-Setup | IS margin | OOS margin | Swing | Karar |
+|---|---|---|---|---|
+| ETH Sweep+FVG (Run13/15) | +2.85pp | -8.10pp | 11pp | Edge yok |
+| XRP OTE (Run20/21) | +7.00pp | -8.30pp | 15pp | Edge yok |
+| (BTC sweep, BNB sweep, vb.) | Çoğu IS -EV | — | — | Edge yok |
+
+**19 backtest iterasyonu (5 sweep + 14 OTE öncesi + Run20 + Run21)
+sonucu: hiçbir ICT setup-symbol kombinasyonu ardışık iki pencerede +EV
+göstermedi.**
+
+**Why:** Crypto piyasası rejim değişikliği fazla. Bir setup'ın "rejim-uyumlu"
+olduğu pencerede +EV görünmesi cherry-pick'ten ayırt edilemez. ICT'nin
+Forex spot piyasası için tasarlanmış varsayımları (fixed session-bound
+behavior, displacement güvenilirliği, retracement öngörülebilirliği)
+crypto'da geçici durumlar yaratıyor.
+
+**Nasıl kullan:**
+- ICT setup'ları için **üç-pencere disiplini** standart: IS + OOS-prior +
+  OOS-later. Tek IS pencere bilgi-tüketici, gerçek edge testi değil.
+- N=200-300 bile yeterli değil — pencere seçimi de varyans kaynağı.
+  Cross-window N≥600 (üç bağımsız 6-ay penceresi) olmadan "edge var"
+  kabul edilmesin.
+- Naïve sembol karakterizasyonu (F-07'nin "XRP mean-reverter") rehberlik
+  vermiyor: F-12'de paradigma reversal gözlemledik, F-13'te o da çöktü.
+- Pivot kararı: Q-011 (ICT paradigm full abandon mi, sembol-tarama mı,
+  farklı TF mi?)
+
+**İlgili dosyalar:**
+[Run20](../../data/backtest/multi_ote_run20.json),
+[Run21](../../data/backtest/multi_ote_run21_xrp_oos.json)
+
+---
+
+## F-12 — OTE'nin paradigm reversal sürprizi (IS-only)
+
+**Bulgu:** OTE trend-following olarak tasarlandı. Run20 IS'de **sadece XRP**
++EV (+7.0pp). F-07'de XRP "low-vol mean-reverter" diye nitelendirilmişti
+— yani OTE'nin paradigmasına ters karakter. Diğer 4 sembol (BTC -4.8,
+ETH -3.6, SOL -7.9, BNB -11.2pp) -EV.
+
+Hipotez: OTE retracement-bağımlı. Mean-reverting sembollerde
+retracements güvenilir ve sık → fib zone'a hassas dokunuş → daha iyi
+WR. Trending sembollerde impulse sonrası fiyat retracement yapmadan
+devam edebilir ya da geç entry'de trend bitmiş olur → SL.
+
+Yani **sembol-strategy eşleştirmesi tezin TERSİ ile mi çalışıyor?**
+- Trend-following setup → mean-reverting karaktere uyum
+- Mean-reversion setup → trending karaktere uyum
+
+**Caveat:** Bu IS gözlemi F-13'te OOS validation'da çöktü. Yani paradigm
+reversal HİPOTEZİ de window-specific çıktı. F-12'nin pratik değeri kaldıysa
+"naïve sembol karakterizasyonuna güvenme" uyarısıdır.
+
+**Nasıl kullan:**
+- "Bu setup şu tür sembollere uyar" iddialarını test öncesi varsayma.
+- F-07'deki sembol-bazlı strateji aileleri planını **deneye dayalı** yap
+  (paradigmaya değil).
+- Trend-following setup'ı sadece "trending coin" üstünde, mean-rev'i
+  sadece "ranging coin" üstünde test etme tuzağına düşme. Çapraz test et.
+
+---
+
 ## F-11 — Run13'ün ETH +EV'si window-specific, OOS'ta çöktü (Run15)
 
 **Bulgu:** Run13'te (2025-11-01 → 2026-05-11) ETH-only N=67 ile **+EV**
@@ -243,3 +316,8 @@ ya da setup'ın kendisi -EV.
    sembole uymaz (F-03).
 8. **Single-window +EV ≠ edge.** İki bağımsız zaman penceresinde
    ardışık +EV şart. Thin margin (<+4pp) hâlâ rastlantı (F-11).
+   **Üç bağımsız pencere** disiplini ICT'de standart yap (F-13).
+9. **Sembol karakteri (mean-reverter / trender) sezgisi yanıltıcı.**
+   Paradigma-eşleştirmesi varsayımına güvenme, deneye dayalı seç (F-12).
+10. **19 iterasyon ICT bilançosu:** hiçbir setup-symbol kombinasyonu
+    ardışık iki pencerede +EV vermedi. ICT paradigm pivot kararı: Q-011.

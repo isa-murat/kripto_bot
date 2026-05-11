@@ -3,10 +3,12 @@
 > Şu an nerede olduğumuzun canlı tablosu. Her oturumda güncellenir.
 
 **Son güncelleme:** 2026-05-11
-**Aktif faz:** Faz 4 sonu / strateji pivot — Sweep+FVG invalidate edildi (ADR-0011), yeni setup seçimi bekliyor
+**Aktif faz:** Faz 4 sonu / **OTE de OOS'ta çöktü** — paradigma pivot kararı bekliyor (Q-011)
 
 > ⚠️ **Bir sonraki strateji denemesinden önce [findings.md](findings.md)'yi oku.**
-> F-01..F-10 bulguları parametre/filtre seçimlerinde ay kazandırır.
+> F-01..F-13 bulguları parametre/filtre seçimlerinde ay kazandırır.
+> Son güncel: F-13 — 19 backtest iterasyonu sonucu hiçbir ICT setup
+> ardışık iki pencerede +EV göstermedi.
 
 ---
 
@@ -20,8 +22,9 @@
 | **Faz 2** — Sweep+FVG strateji + signal router + main.py entegrasyon | ✅ Tamam | 1 oturum |
 | **Faz 3** — Paper engine + position manager + günlük rapor | ✅ Tamam | 1 oturum |
 | **Faz 4** — Backtest + metrikler (Rust checkpoint) | ✅ Tamam (N=309 final, Sweep+FVG -EV doğrulandı, ADR-0011) | — |
-| **Faz 4.5** — Strateji pivot: yeni setup ailesi seçimi (Silver Bullet / OTE / Breaker / non-ICT) | ⏳ Sırada — `findings.md` okunarak başlanacak | TBD |
-| **Faz 5** — İyileştirme (filtreler, tuning, monitoring) | ⏳ Yeni setup +EV olduktan sonra | sürekli |
+| **Faz 4.5** — OTE setup'ı dene | ✅ Tamam (Run20 IS pool -EV, Run21 XRP OOS -EV, F-12/F-13) | — |
+| **Faz 4.6** — ICT paradigm pivot kararı (Q-011) | 🟡 Aktif — kullanıcı tartışması bekliyor | — |
+| **Faz 5** — İyileştirme (filtreler, tuning, monitoring) | ⏳ Yeni paradigma +EV olduktan sonra | sürekli |
 
 ---
 
@@ -200,6 +203,33 @@ jupyter `[backtest]` extra'sında zaten tanımlı.)
 ---
 
 ## Notlar / log
+
+- **2026-05-11 (oturum N+6 — OTE setup + Run20 IS + Run21 XRP OOS):**
+  - **Yeni modüller:** `src/strategies/ote.py` (klasik ICT OTE: HTF bias → 5m MSS → impulse leg → fib 0.618-0.786 zone first-touch → 2R fixed TP).
+    `setup_ote` config bölümü, `STRATEGY_REGISTRY` dispatcher (`src/backtest/runner.py` + `scripts/multi_symbol_backtest.py` `--strategy` flag'i).
+  - **Testler:** `tests/test_ote.py` 12 yeni test (sentetik bull-HTF + LTF retrace positive integration test dahil). Suite **247/247 PASSED** (eski 235 + 12 yeni).
+  - **Run20 (OTE IS, 2025-11..2026-05, 5 sembol, N=1375):**
+    | Sembol | N | WR | Margin | Return |
+    |---|---|---|---|---|
+    | BTC | 276 | 34.1% | -4.8pp | -37.1% |
+    | ETH | 252 | 34.1% | -3.6pp | -28.3% |
+    | SOL | 275 | 29.5% | -7.9pp | -50.9% |
+    | BNB | 292 | 27.7% | -11.2pp | -65.5% |
+    | **XRP** | 280 | **44.6%** | **+7.0pp** | **+68.9%** |
+    | **POOL** | **1375** | **34.0%** | **-4.1pp** | — |
+  - **Paradigma sürprizi (F-12):** Trend-following OTE en iyiyi mean-reverter karakter XRP'de verdi. F-07'nin "sembol karakteri" tezi ters yöne çalıştı.
+  - **Run21 (XRP OOS, 2025-05..2025-10, F-11 disiplini):**
+    | Metrik | IS (Run20) | OOS (Run21) |
+    |---|---|---|
+    | N | 280 | 276 |
+    | WR | 44.6% | 29.3% |
+    | Margin | +7.0pp | **-8.3pp** |
+    | Return | +68.9% | -53.1% |
+    | Sharpe | 2.03 | -3.39 |
+    | Max DD | 17.5% | 54.0% |
+  - **15pp margin swing** (ETH'in 11pp swing'inden büyük) → **F-13**: XRP-OTE de window-specific fluke. F-11 üçüncü kez tetiklendi.
+  - **Karar:** ICT paradigm fundamental gözden geçirme gerekli (Q-011). Sweep+FVG ve OTE'nin ikisi de pool -EV, tek pozitif sembol-pencere kombinasyonları OOS'ta çökü̧yor. 19 backtest iterasyonu, ICT bilançosu sıfır.
+  - **findings.md F-12 + F-13 + Özet madde 8-10 eklendi. Q-008 cevaplandı, Q-011 açıldı.**
 
 - **2026-05-11 (oturum N+5 — Run15 ETH OOS, B opsiyonu kesinleşti):**
   - Hipotez: Run13'te ETH-only +EV (N=67, margin +2.85pp, +$11.18/trade) → ETH niche bot yapılabilir mi?

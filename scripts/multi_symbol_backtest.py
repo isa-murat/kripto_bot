@@ -23,9 +23,8 @@ from pathlib import Path
 import typer
 
 from src.backtest.metrics import BacktestMetrics, format_metrics
-from src.backtest.runner import run_backtest, trade_to_dict
+from src.backtest.runner import STRATEGY_REGISTRY, run_backtest, trade_to_dict
 from src.config import REPO_ROOT, get_settings, get_strategy_params
-from src.strategies.sweep_fvg import SetupParams
 from src.utils.logging import setup_logging
 from src.utils.rr_metrics import calculate_expectancy, format_expectancy
 
@@ -45,6 +44,7 @@ def main(
     to: str | None = typer.Option(None),
     no_killzone: bool = typer.Option(False),
     initial_equity: float = typer.Option(10_000.0),
+    strategy: str = typer.Option("sweep_fvg", help=f"Strategy: {list(STRATEGY_REGISTRY)}"),
     output: Path | None = typer.Option(None, help="JSON output for combined results."),
     output_prefix: str | None = typer.Option(
         None,
@@ -56,11 +56,17 @@ def main(
     from_dt = _parse_date(from_)
     to_dt = _parse_date(to) if to else datetime.now(tz=UTC)
 
+    if strategy not in STRATEGY_REGISTRY:
+        raise typer.BadParameter(
+            f"Unknown strategy {strategy!r}. Choose from {list(STRATEGY_REGISTRY)}"
+        )
+    _, ParamsCls = STRATEGY_REGISTRY[strategy]
+
     settings = get_settings()
     maker_rate = settings.paper.fee_maker
     taker_rate = settings.paper.fee_taker
 
-    params = SetupParams.from_strategy_params(get_strategy_params())
+    params = ParamsCls.from_strategy_params(get_strategy_params())
     if no_killzone:
         params.require_killzone = False
 
@@ -74,6 +80,7 @@ def main(
             metrics, broker = asyncio.run(run_backtest(
                 symbol=symbol, from_dt=from_dt, to_dt=to_dt,
                 params=params, initial_equity=initial_equity,
+                strategy=strategy,
             ))
         except Exception as e:
             typer.echo(f"  FAILED: {e}")
@@ -99,6 +106,7 @@ def main(
             per_path.parent.mkdir(parents=True, exist_ok=True)
             per_payload = {
                 "symbol": symbol,
+                "strategy": strategy,
                 "from": from_dt.isoformat(),
                 "to": to_dt.isoformat(),
                 "params": asdict(params),
@@ -169,6 +177,7 @@ def main(
     if output is not None:
         output.parent.mkdir(parents=True, exist_ok=True)
         payload = {
+            "strategy": strategy,
             "from": from_dt.isoformat(),
             "to": to_dt.isoformat(),
             "symbols": sym_list,

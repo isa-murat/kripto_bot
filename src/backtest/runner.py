@@ -29,8 +29,15 @@ from src.engine.paper_broker import CloseReason, PaperBroker
 from src.engine.position_mgr import PositionManager
 from src.engine.signal_router import SignalRouter
 from src.filters.regime_filter import is_regime_tradeable
-from src.strategies.sweep_fvg import SetupParams, TradeSignal
-from src.strategies.sweep_fvg import evaluate as evaluate_sweep_fvg
+from src.strategies import ote as _ote_mod
+from src.strategies import sweep_fvg as _sweep_mod
+from src.strategies.sweep_fvg import TradeSignal
+
+# Strategy registry: name -> (evaluate_fn, SetupParams class)
+STRATEGY_REGISTRY = {
+    "sweep_fvg": (_sweep_mod.evaluate, _sweep_mod.SetupParams),
+    "ote":       (_ote_mod.evaluate,   _ote_mod.SetupParams),
+}
 from src.utils.logging import logger, setup_logging
 from src.utils.rr_metrics import calculate_expectancy, format_expectancy
 from src.utils.time import timeframe_to_seconds
@@ -97,9 +104,16 @@ async def run_backtest(
     to_dt: datetime,
     entry_tf: str = "5m",
     bias_tf: str = "1h",
-    params: SetupParams | None = None,
+    params=None,
     initial_equity: float = 10_000.0,
+    strategy: str = "sweep_fvg",
 ) -> tuple[BacktestMetrics, PaperBroker]:
+    if strategy not in STRATEGY_REGISTRY:
+        raise ValueError(
+            f"Unknown strategy {strategy!r}. Available: {list(STRATEGY_REGISTRY)}"
+        )
+    evaluate_strategy, ParamsCls = STRATEGY_REGISTRY[strategy]
+
     df_ltf = _filter_range(_load_parquet(symbol, entry_tf), from_dt, to_dt)
     df_htf = _filter_range(_load_parquet(symbol, bias_tf), from_dt, to_dt)
     if df_ltf.height < MIN_BARS_FOR_STRATEGY or df_htf.height < MIN_BARS_FOR_STRATEGY:
@@ -109,7 +123,7 @@ async def run_backtest(
         )
 
     if params is None:
-        params = SetupParams.from_strategy_params(get_strategy_params())
+        params = ParamsCls.from_strategy_params(get_strategy_params())
 
     settings = get_settings()
     # Use a tmp snapshot so test runs / multiple backtests don't clash
@@ -209,7 +223,7 @@ async def run_backtest(
         df_htf_w = df_htf.slice(htf_start, htf_idx - htf_start + 1)
         local_htf_idx = htf_idx - htf_start
 
-        signal = evaluate_sweep_fvg(
+        signal = evaluate_strategy(
             symbol=symbol,
             df_ltf=df_ltf_w,
             df_htf=df_htf_w,
@@ -266,6 +280,7 @@ def run(
     bias_tf: str = typer.Option("1h"),
     initial_equity: float = typer.Option(10_000.0),
     no_killzone: bool = typer.Option(False, help="Disable killzone filter (longer evaluation window)"),
+    strategy: str = typer.Option("sweep_fvg", help=f"Strategy to evaluate. One of: {list(STRATEGY_REGISTRY)}"),
     output: Path | None = typer.Option(None, help="Optional JSON output path for metrics + trades"),
 ) -> None:
     setup_logging()
@@ -273,7 +288,12 @@ def run(
     from_dt = _parse_iso_date(from_)
     to_dt = _parse_iso_date(to) if to else datetime.now(tz=UTC)
 
-    params = SetupParams.from_strategy_params(get_strategy_params())
+    if strategy not in STRATEGY_REGISTRY:
+        raise typer.BadParameter(
+            f"Unknown strategy {strategy!r}. Choose from {list(STRATEGY_REGISTRY)}"
+        )
+    _, ParamsCls = STRATEGY_REGISTRY[strategy]
+    params = ParamsCls.from_strategy_params(get_strategy_params())
     if no_killzone:
         params.require_killzone = False
 
@@ -281,6 +301,7 @@ def run(
         symbol=symbol, from_dt=from_dt, to_dt=to_dt,
         entry_tf=entry_tf, bias_tf=bias_tf,
         params=params, initial_equity=initial_equity,
+        strategy=strategy,
     ))
 
     typer.echo(format_metrics(metrics))
@@ -297,6 +318,7 @@ def run(
         output.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "symbol": symbol,
+            "strategy": strategy,
             "from": from_dt.isoformat(),
             "to": to_dt.isoformat(),
             "entry_tf": entry_tf,

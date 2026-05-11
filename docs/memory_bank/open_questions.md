@@ -6,20 +6,24 @@
 
 ## Aktif sorular
 
-- [ ] **Q-008:** Yeni strateji ailesi hangisi olmalı?
-  - Bağlam: ADR-0011 ile Sweep+FVG terk edildi. Adaylar:
-    - **Silver Bullet** (NY killzone tabanlı) — ama F-06: killzone bu setup'ta edge vermedi; crypto'da Forex saatleri çalışmıyor
-    - **OTE** (Optimal Trade Entry, fib 61.8-78.6) — momentum entry, Sweep'ten farklı tetikleyici
-    - **Breaker Block Retest** — MSS sonrası ters OB retest; sweep gerektirmez
-    - **Non-ICT mean-reversion** — özellikle XRP için (F-07)
-    - **Setup-symbol pair'leri:** her sembol için farklı strateji ailesi
-  - Etkilediği yerler: `src/strategies/` altına yeni modül, signal router
-  - **Plan:** Kullanıcıyla tartışılacak; F-01..F-10 önkoşul okuma.
+- [ ] **Q-011:** ICT paradigma terk mi, sembol-tarama mı, farklı zaman çerçevesi mi?
+  - Bağlam: 19 backtest iterasyonu (Sweep+FVG + OTE) bir ICT setup-symbol kombinasyonunun ardışık iki pencerede +EV gösterdiğini göstermedi. F-13'te paradigma reversal hipotezi (F-12) de OOS'ta çöktü.
+  - Adaylar:
+    - **A) ICT tamamen terk** — fundamental farklı yaklaşım: statistical arbitrage, ML-based, order flow / volume profile, funding-rate arbitrage. ICT'nin Forex varsayımları crypto'ya transfer olmadığı kanıtlandı.
+    - **B) Sembol tarama** — top-20/50 USDT-M pair üzerinde mevcut OTE'yi tara (geniş universe). F-12'deki paradigm reversal hipotezini deneysel olarak test et; XRP-tip sembolleri bul (low-vol mean-reverter karakter), her birini iki window'da OOS-validate et. Kapsam genişledikçe edge'li bir alt-küme bulunabilir.
+    - **C) Farklı zaman çerçevesi** — 15m bias + 5m entry yerine 1h bias + 15m entry (daha az gürültü, daha az sinyal, kalite-odaklı). ICT'yi terketmeden TF-pivot.
+    - **D) Volatility-aware TP** + B paralel — F-03 önerisi tek başına yetmedi ama belki sembol-tarama ile birlikte fark yaratır.
+  - Etkilediği yerler: tüm strateji ailesi, `src/data/downloader.py` (B için 50 sembol indirme), backtest pipeline.
 
 - [ ] **Q-009:** Sembol seçimi yeniden değerlendirilmeli mi?
   - Bağlam: F-07 → XRP low-vol mean-reverter, F-03 → BTC/BNB trend ETH/SOL choppy. Top-5 uniform tedavi etmek edge'i öldürdü.
   - Etkilediği yerler: `config/settings.yaml` symbols listesi
   - **Plan:** Yeni strateji seçildiğinde sembol filtresi de tasarlanır.
+
+- [ ] **Q-009:** Sembol seçimi yeniden değerlendirilmeli mi?
+  - Bağlam: F-07 → XRP low-vol mean-reverter, F-03 → BTC/BNB trend ETH/SOL choppy. Top-5 uniform tedavi etmek edge'i öldürdü. F-12'de paradigm reversal sürprizi gözlemlendi ama F-13'te o da OOS'ta çöktü.
+  - Etkilediği yerler: `config/settings.yaml` symbols listesi
+  - **Plan:** Q-011 cevabına bağlı. Eğer B (sembol tarama) seçilirse bu otomatik genişler.
 
 - [ ] **Q-010:** TP stratejisi volatility-aware nasıl modellenmeli?
   - Bağlam: F-03 → TP-nearest BTC/BNB negatif, ETH/SOL pozitif. Uniform formül imkansız.
@@ -63,6 +67,12 @@
 ---
 
 ## Cevaplanmış (referans için)
+
+- ✅ **Q-008 (2026-05-11):** Yeni strateji ailesi hangisi olmalı?
+  - **Seçim:** OTE (Klasik ICT, 2R sabit TP, 5 sembol birden).
+  - **Sonuç:** Run20 IS pool -EV (-4.1pp, N=1375), tek pozitif XRP +7.0pp.
+    Run21 OOS'da XRP -8.3pp → window-specific fluke (F-13).
+    Yeni soru Q-011: ICT paradigma terk mi, tarama mı, TF değişikliği mi?
 
 - ✅ **Q-001 (2026-05-11):** Binance API key permission?
   - **Cevap:** Read-only. Paper trading için trade izni gereksiz; gerçek trading'e

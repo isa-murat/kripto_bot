@@ -67,6 +67,34 @@ setup_sweep_fvg:
   # bir kısmı 3.5R+ idi, fiyat yola çıkamadan SL'e takılıyordu).
   max_rr: 4.0
 
+setup_ote:
+  # OTE (Optimal Trade Entry) — klasik ICT, trend-following.
+  # MSS sonrası impulse leg'in fib retracement zonuna (0.618-0.786) entry.
+  # 2026-05-11 baseline parametreleri — backtest sonrası tune edilecek.
+  #
+  # MSS'i geriye doğru tarama penceresi
+  mss_lookback_bars: 30
+  # MSS öncesi leg base'i ararken pencere (daha geniş = daha eski leg'ler)
+  max_leg_lookback_bars: 50
+  # Leg amplitude > min_leg_atr_mult × ATR (gürültü leg'lerini at)
+  min_leg_atr_mult: 1.5
+  # Fib zone sınırları (ICT canonical 0.618-0.786)
+  fib_zone_low: 0.618
+  fib_zone_high: 0.786
+  fib_entry_target: 0.705
+  # SL = leg_base ± sl_buffer_atr × ATR
+  sl_buffer_atr: 0.30
+  min_sl_distance_atr: 0.50
+  # Sabit 2R TP — F-03 baseline. Volatility-aware TP ileride.
+  tp_r_multiple: 2.0
+  # Fee modeli (sweep_fvg ile aynı)
+  max_fee_to_reward_ratio: 0.30
+  fee_rate_round_trip: 0.0008
+  # Killzone default OFF (F-06: ICT killzone crypto'da Forex'teki gibi çalışmıyor)
+  require_killzone: false
+  # Sadece HTF trend (zone bonus, zorunlu değil)
+  bias_zone_required: false
+
 risk:
   # Account-level
   max_daily_loss_pct: 0.03      # equity %3 düşerse o günü kapat
