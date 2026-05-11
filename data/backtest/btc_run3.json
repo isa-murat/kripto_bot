@@ -1,0 +1,154 @@
+{
+  "symbol": "BTCUSDT",
+  "from": "2025-11-01T00:00:00+00:00",
+  "to": "2026-05-11T01:04:58.941236+00:00",
+  "entry_tf": "5m",
+  "bias_tf": "1h",
+  "params": {
+    "swing_lookback": 3,
+    "displacement_atr_mult": 1.5,
+    "equal_level_tolerance_atr": 0.1,
+    "sweep_min_wick_pct": 0.3,
+    "sweep_to_mss_max_bars": 10,
+    "mss_to_fvg_max_bars": 5,
+    "fvg_min_atr_mult": 0.15,
+    "fvg_max_age_bars": 30,
+    "sl_buffer_atr": 0.2,
+    "min_sl_distance_atr": 0.5,
+    "min_rr": 2.0,
+    "max_fee_to_reward_ratio": 0.3,
+    "fee_rate_round_trip": 0.0008,
+    "htf_swing_lookback": 5,
+    "htf_range_lookback_swings": 4,
+    "htf_premium_threshold": 0.5,
+    "htf_discount_threshold": 0.5,
+    "require_killzone": false,
+    "bias_zone_required": false
+  },
+  "metrics": {
+    "total_trades": 5,
+    "wins": 1,
+    "losses": 4,
+    "breakevens": 0,
+    "win_rate": 0.2,
+    "gross_profit": 167.23683414009454,
+    "gross_loss": -625.0142547051965,
+    "profit_factor": 0.2675728319492104,
+    "avg_win": 167.23683414009454,
+    "avg_loss": -156.25356367629914,
+    "largest_win": 167.23683414009454,
+    "largest_loss": -181.05697217952616,
+    "total_pnl": -457.77742056510203,
+    "initial_equity": 10000.0,
+    "final_equity": 9542.2225794349,
+    "return_pct": -4.577774205651009,
+    "max_drawdown": 625.0142547051946,
+    "max_drawdown_pct": 6.147336438613175,
+    "sharpe": -1.3998490526141578,
+    "duration_days": 63.27777777777778,
+    "equity_curve": [
+      {
+        "ts": "2025-12-09T23:35:00+00:00",
+        "equity": 10167.236834140094
+      },
+      {
+        "ts": "2026-01-13T13:30:00+00:00",
+        "equity": 9998.519197212503
+      },
+      {
+        "ts": "2026-01-20T14:45:00+00:00",
+        "equity": 9817.462225032978
+      },
+      {
+        "ts": "2026-02-11T04:20:00+00:00",
+        "equity": 9666.215502400899
+      },
+      {
+        "ts": "2026-02-11T06:15:00+00:00",
+        "equity": 9542.2225794349
+      }
+    ]
+  },
+  "trades": [
+    {
+      "id": "BTCUSDT_11215_1765319700",
+      "symbol": "BTCUSDT",
+      "side": "bull",
+      "fill_entry": 92578.52577600001,
+      "exit_price": 92870.07129,
+      "stop_loss": 92447.625,
+      "take_profit": 92871.0,
+      "size": 0.7693787266781729,
+      "pnl": 167.23683414009454,
+      "close_reason": "take_profit",
+      "opened_ts": "2025-12-09T22:35:00+00:00",
+      "filled_ts": "2025-12-09T23:10:00+00:00",
+      "closed_ts": "2025-12-09T23:35:00+00:00",
+      "rr_target": 2.2573571840737143
+    },
+    {
+      "id": "BTCUSDT_21140_1768297200",
+      "symbol": "BTCUSDT",
+      "side": "bear",
+      "fill_entry": 92400.37598699999,
+      "exit_price": 92479.75693117856,
+      "stop_loss": 92478.83214285714,
+      "take_profit": 91986.1,
+      "size": 1.1003348258238896,
+      "pnl": -168.71763692759205,
+      "close_reason": "stop_loss",
+      "opened_ts": "2026-01-13T09:40:00+00:00",
+      "filled_ts": "2026-01-13T13:30:00+00:00",
+      "closed_ts": "2026-01-13T13:30:00+00:00",
+      "rr_target": 5.355198304849953
+    },
+    {
+      "id": "BTCUSDT_20911_1768228500",
+      "symbol": "BTCUSDT",
+      "side": "bull",
+      "fill_entry": 90379.703788,
+      "exit_price": 90283.02930353572,
+      "stop_loss": 90283.93214285714,
+      "take_profit": 90708.5,
+      "size": 1.0717262031996064,
+      "pnl": -181.05697217952616,
+      "close_reason": "stop_loss",
+      "opened_ts": "2026-01-12T14:35:00+00:00",
+      "filled_ts": "2026-01-20T14:45:00+00:00",
+      "closed_ts": "2026-01-20T14:45:00+00:00",
+      "rr_target": 3.4753604638028666
+    },
+    {
+      "id": "BTCUSDT_28368_1770465600",
+      "symbol": "BTCUSDT",
+      "side": "bull",
+      "fill_entry": 67851.72851049999,
+      "exit_price": 67747.5296607857,
+      "stop_loss": 67748.20714285714,
+      "take_profit": 68097.6,
+      "size": 0.9546080785558296,
+      "pnl": -151.24672263207924,
+      "close_reason": "stop_loss",
+      "opened_ts": "2026-02-07T12:00:00+00:00",
+      "filled_ts": "2026-02-11T04:20:00+00:00",
+      "closed_ts": "2026-02-11T04:20:00+00:00",
+      "rr_target": 2.397346853729971
+    },
+    {
+      "id": "BTCUSDT_28110_1770388200",
+      "symbol": "BTCUSDT",
+      "side": "bull",
+      "fill_entry": 66933.1193245,
+      "exit_price": 66723.40775925,
+      "stop_loss": 66724.075,
+      "take_profit": 67472.0,
+      "size": 0.47114395800998093,
+      "pnl": -123.99292296599913,
+      "close_reason": "stop_loss",
+      "opened_ts": "2026-02-06T14:30:00+00:00",
+      "filled_ts": "2026-02-11T06:10:00+00:00",
+      "closed_ts": "2026-02-11T06:15:00+00:00",
+      "rr_target": 2.5893221355728993
+    }
+  ]
+}

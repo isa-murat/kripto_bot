@@ -1,0 +1,63 @@
+# Run from repo root:
+#   docker compose up -d --build
+#   docker compose logs -f
+#   docker compose down
+#
+# Build context = repo root (.), Dockerfile lives in docker/.
+# Ignore rules: docker/Dockerfile.dockerignore (BuildKit picks it up automatically).
+
+services:
+  kripto-bot:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: kripto-bot:latest
+    container_name: kripto-bot
+    restart: unless-stopped
+    init: true                    # PID 1 + signal forwarding (temiz Ctrl+C / docker stop)
+    stop_grace_period: 30s        # SIGTERM sonrası graceful shutdown için süre
+    env_file: .env
+    volumes:
+      # Persistent state — container restart'ta Parquet/SQLite kaybolmaz
+      - ./data:/app/data
+      - ./logs:/app/logs
+      # Config dosyaları — değiştirip restart edersek yeni değerler okunur
+      - ./config:/app/config:ro
+      # Tests — host'taki değişiklikler `docker compose run pytest` ile anında görünür
+      # (image'da da bake edilmiş, ama bu mount image içeriğini override eder)
+      - ./tests:/app/tests:ro
+    command: python -m src.main run
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    # Hot reload — `docker compose watch` ile aktif olur (normal `up` etkilenmez)
+    # src/, config/, scripts/ değişince container otomatik restart
+    # pyproject.toml veya Dockerfile değişince image baştan build
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+          ignore:
+            - "**/__pycache__"
+            - "**/*.pyc"
+        - action: sync+restart
+          path: ./config
+          target: /app/config
+        - action: sync+restart
+          path: ./scripts
+          target: /app/scripts
+          ignore:
+            - "**/__pycache__"
+        - action: sync                 # tests bot'u etkilemez, sadece dosya sync
+          path: ./tests
+          target: /app/tests
+          ignore:
+            - "**/__pycache__"
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./docker/Dockerfile

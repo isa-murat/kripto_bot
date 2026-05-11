@@ -1,0 +1,60 @@
+# BuildKit picks up <dockerfile>.dockerignore alongside the Dockerfile.
+# Keeps build context lean even though the build context is the repo root.
+
+# Python venv & cache
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build artefaktları
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Veri (compose volume olarak mount edilir)
+data/
+logs/
+*.parquet
+*.db
+*.sqlite
+*.sqlite3
+
+# Sırlar
+.env
+.env.local
+*.key
+*.pem
+
+# VCS
+.git/
+.gitignore
+.github/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Notebooks (geliştirme amaçlı, container'a girmesin)
+notebooks/
+*.ipynb
+.ipynb_checkpoints/
+
+# Misc
+.cache/
+tmp/
+target/
+Cargo.lock
+*.pdb
+
+# Docker dosyalarının kendisi (image içinde gerekli değil)
+docker/

@@ -1,0 +1,75 @@
+# ICT strateji parametreleri.
+# Faz 4 backtest sırasında bu değerler tune edilecek.
+
+structure:
+  # Swing/pivot tespitinde her yöne lookback (fractal mum sayısı)
+  swing_lookback_5m: 3
+  swing_lookback_1h: 5
+  # Displacement = body büyüklüğü > displacement_atr_mult × ATR
+  displacement_atr_mult: 1.5
+  atr_period: 14
+
+poi:
+  # FVG min boyutu = fvg_min_atr_mult × ATR; çok küçük FVG'leri filtrele
+  fvg_min_atr_mult: 0.15
+  # FVG'nin "fresh" sayılma süresi (mum sayısı). Bu süreden sonra geçerliliğini yitirir.
+  fvg_max_age_bars: 30
+  # Order Block tanımı: displacement öncesi son opposite mum body'si
+  ob_lookback: 10
+
+liquidity:
+  # Equal high/low tolerance: tolerance_atr_mult × ATR
+  # Wider tolerance = swings cluster better → fewer but stronger pools
+  equal_level_tolerance_atr: 0.30
+  # Minimum kaç swing yan yana olmalı equal sayılması için (pool_min_touches).
+  # 2 = sadece equal H/L kümeleri pool sayılır (tek swing pool olmaz).
+  equal_min_count: 2
+  # Pool oluştuktan sonra en az kaç bar geçmeli — taze swing'ler "magnet" değil
+  pool_min_age_bars: 10
+  # Sweep tespiti: fitil pool'u geçmeli, body altında/üstünde kalmalı
+  sweep_min_wick_pct: 0.20   # mumun %20'si en az fitil olmalı (gevşetildi)
+  # Pool oluşturmak için son N swing
+  pool_lookback_swings: 20
+
+bias:
+  # 1h trend: son N swing'in yönü baskınsa o yöndedir
+  trend_min_swings: 2
+  # Premium/discount range tanımı: son N major swing arası
+  range_lookback_swings: 4
+  # Fiyatın discount/premium sayılması için %50 sınırı
+  premium_threshold: 0.50
+  discount_threshold: 0.50
+
+setup_sweep_fvg:
+  # Sweep'i geriye doğru ne kadar bar tarayalım — setup multi-bar gelişir
+  sweep_lookback_bars: 30
+  # Sweep ile MSS arası max bar (daha geniş = daha çok signal, kalite düşebilir)
+  sweep_to_mss_max_bars: 20
+  # MSS sonrası FVG aranan max bar
+  mss_to_fvg_max_bars: 5
+  # FVG'ye retest için max bar
+  fvg_retest_max_bars: 15
+  # SL = sweep fitilinin sl_buffer_atr × ATR ötesi (geniş = liquidity sweep'ten korunur)
+  sl_buffer_atr: 0.30
+  # En sıkışık SL bile bu kadar uzakta olsun (fee/leverage patlamasını engeller)
+  min_sl_distance_atr: 0.50
+  # Round-trip fee bu fraction × reward'ı aşıyorsa setup atla
+  max_fee_to_reward_ratio: 0.30
+  fee_rate_round_trip: 0.0008
+  # Bias mantığı: True = ICT puristleri (trend + uyumlu zone), False = sadece trend
+  bias_zone_required: false
+  # Min RR — bu altındaysa sinyal atılmaz.
+  # Auto-updated 2026-05-11 from multi_run13.json:
+  #   N=309 trades | Observed WR 29.1% | Break-even WR 33.5% | Margin -4.4pp
+  #   Expectancy: $-17.98/trade (-0.19R)
+  min_rr: 2.0
+  # Max RR — bunun ötesindeki "uzak major pool"lar atlanır (run10'da TP'lerin
+  # bir kısmı 3.5R+ idi, fiyat yola çıkamadan SL'e takılıyordu).
+  max_rr: 4.0
+
+risk:
+  # Account-level
+  max_daily_loss_pct: 0.03      # equity %3 düşerse o günü kapat
+  max_open_positions: 2
+  # Per-symbol
+  symbol_cooldown_minutes: 30

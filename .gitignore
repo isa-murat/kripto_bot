@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+kripto_bot/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Claude Code per-developer settings
+.claude/settings.local.json
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+api_keys.txt
+secrets.yaml
+
+# Logs
+logs/
+*.log
+
+# Data (büyük, regenerate edilebilir)
+data/raw/
+data/cache/
+data/ohlcv/
+data/paper/
+
+# NOT: data/backtest/*.json TRACK EDİLİYOR — küçük JSON, F-XX bulguları için referans
+
+# Docker runtime
+.docker/
+
+# OS
+*.tmp
+*.bak
+*~
