@@ -29,5 +29,9 @@ Bunlardan biri eksikse → ICT projesini terk, Opsiyon A'ya geç.
 - Tek bir sembolün +EV olmasını "kısmen başarı" saymak
 - IS başarılı OOS başarısızsa "üçüncü pencere deneyelim" demek
 - 1h ve 15m kombinasyonunu 2h+30m gibi varyantlarla revize etmek
+- "Yakın fail" rasyonalizasyonu yasaktır: Bir kriter eşiğin %5'inden az
+  farkla altında kalsa bile FAIL'dir. Yuvarlama, "neredeyse pass",
+  "OOS güçlü olursa IS'i affederiz" gibi argümanlar geçersiz. Eşikler
+  matematiksel kesin sınırlardır.
 
 19 iterasyondan sonra disiplinden çıkmak için artık zaman yok.
